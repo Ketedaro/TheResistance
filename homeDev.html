@@ -8,11 +8,14 @@
 			Login :<input type="text" name="login" id="login"> <br>
 			Password :<input type="password" name="password" id="password"> <br>
 			<button type="button" id="btn-token"> Token </button>
-			<button type="button" id="btn-auth"> Authenticate </button>
-			<button type="button" id="btn-list_game"> List </button>
-			<button type="button" id="btn-show_game"> Show </button>
+			<button type="button" id="btn-auth"> Authenticate </button> <br>
+
+			Create game name :<input type="text" name="game_name" id="game_name"> <br>
+			Number of players :<input type="number" name="number_players" id="number_players" min="5" max="10"> <br>
 			<button type="button" id="btn-create_game"> Create </button> <br>
-			Game name :<input type="text" name="game_name" id="game_name"> <br>
+			<button type="button" id="btn-list_game"> List </button> <br>
+			<button type="button" id="btn-show_game"> Show </button> <br>
+			Search game by name :<input type="text" name="searched_name_game" id="searched_name_game">
 			<button type="button" id="btn-create_game"> Search  </button>
 		</form>
 		<!-- Documentation github.com/elwinar/the-resistance   -->
@@ -29,6 +32,7 @@
 			
 			var game = {
 				id: '',
+				players: '',
 				created_at: '',
 				started_at: '',
 				finished_at: '',
@@ -84,17 +88,23 @@
 						'token': state.token,
 					},
 					success: function(data) {
+						var game = [];
 						for(var i = 0; i < data.length; i++) {
-							game.id = data[i].id;
-							game.created_at = data[i].created_at;
-							game.started_at = data[i].started_at;
-							game.finished_at = data[i].finished_at;
-							console.log(game.id + game.created_at + game.started_at + game.finished_at)
+							game.push({ 
+								id: data[i].id, 
+								name: data[i].name,
+								players: data[i].players, 
+								created_at: data[i].created_at, 
+								started_at: data[i].started_at, 
+								finished_at: data[i].finished_at
+							});
+							console.log(game[i].id + game[i].players + game[i].created_at + game[i].started_at + game[i].finished_at + game[i].name)
 						}
 					},
 				}); 
 			});
 			
+			//Parameters
 			$('#btn-show_game').on("click", function showGame() {
 				$.ajax({
 					type: 'GET',
@@ -114,22 +124,30 @@
 			});
 			
 			$('#btn-create_game').on("click", function createGame() {
+				var new_game_name = $('#game_name').val();
+				var number_players = $('#number_players').val();
+				var payload = {
+					"name": new_game_name,
+					"players": parseInt(number_players)
+				};
+
 				$.ajax({
 					type: 'POST',
 					dataType: 'json',
 					url: cfg.domain + '/game',
+					data: JSON.stringify(payload),
 					headers: {
 						'token': state.token,
 					},
 					success: function(data) {
-						game.id = data.id;
-						console.log(game.id);
+						
+						console.log(game.name);
 					},
 				}); 
 			});			
 			
 			$('#btn-search_game').on("click", function searchGameByName() {
-				game.name = $('#game_name').val();
+				var searched_name = $('#searched_name_game').val();
 				$.ajax({
 					type: 'POST',
 					dataType: 'json',
@@ -139,8 +157,8 @@
 					},
 					success: function(data) {
 						for(var i = 0; i < data.length; i++) {
-							if (data[i].name === game.name) {
-								console.log("Game " + game.name + " found with ID : " + game.id)
+							if (data[i].name === searched_name) {
+								console.log("Game " + data[i].name + " found with ID : " + game.id)
 							} else {
 								console.log("No game found")
 							}
