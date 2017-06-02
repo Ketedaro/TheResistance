@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+	</head>
+	<body>
+		<form name="logForm">
+			Login :<input type="text" name="login" id="login"> <br>
+			Password :<input type="password" name="password" id="password"> <br>
+			<button type="button" id="btn-token"> Token </button>
+			<button type="button" id="btn-auth"> Authenticate </button>
+			<button type="button" id="btn-show_game"> Show </button>
+		</form>
+		<!-- Documentation github.com/elwinar/the-resistance   -->
+		<script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+		<script> 
+		
+			var cfg = {
+				domain: "http://ogg.elwinar.com:56789",
+			};
+
+			var state = {
+				token: '',
+			};
+
+
+
+			$('#btn-token').on("click", function getToken() {
+				var login = $('#login').val();
+				var password = $('#password').val();
+				var payload = {
+					"login" : login,
+					"password" : password
+				};
+
+				$.ajax({
+					type: 'POST',
+					dataType: 'json',
+					url: cfg.domain + '/login',
+					data: JSON.stringify(payload),
+					success: function(data) {
+						state.token = data.token;
+						console.log("Your token : " + state.token);
+					},
+				}); 
+			});
+					
+			$('#btn-auth').on("click", function authentication() {
+				$.ajax({
+					type: 'POST',
+					dataType: 'json',
+					url: cfg.domain + '/authenticate',
+					headers: {
+						'token': state.token,
+					},
+					success: function(data) {
+						if(data.authenticated) {
+							console.log("You are authenticated");
+						} else {
+							console.log("Error authentication")
+						}
+					},
+				}); 
+			});
+
+			$('#btn-show_game').on("click", function showGame() {
+				$.ajax({
+					type: 'POST',
+					dataType: 'json',
+					url: cfg.domain + '/authenticate',
+					headers: {
+						'token': state.token,
+					},
+					success: function(data) {
+						if(data.authenticated) {
+							console.log("You are authenticated");
+						} else {
+							console.log("Error authentication")
+						}
+					},
+				}); 
+			});
+			
+			
+			
+			/* $("#butt").onclick function(eu)
+					$(window).fire('page_change' $(eu.target).attr[href])
+			*/
+		</script>
+	</body>
+</html>
