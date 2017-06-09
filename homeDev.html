@@ -15,9 +15,17 @@
 			<button type="button" id="btn-create_game"> Create </button> <br>
 			<button type="button" id="btn-list_game"> List </button> <br>
 			<button type="button" id="btn-show_game"> Show </button> <br>
-			Search game by name :<input type="text" name="searched_name_game" id="searched_name_game">
+			<div id="dropdown">
+				<select name="drop-down-list" id="drop-down-list"></select>
+			</div>
+			Join a game :<input type="text" name="join_game" id="join_game">
 			<button type="button" id="btn-create_game"> Search  </button>
 		</form>
+		<div id="welcome"><p>Welcome !</p></div>
+		<div id="test"><p>Test</p></div>
+		
+		
+		
 		<!-- Documentation github.com/elwinar/the-resistance   -->
 		<script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
 		<script> 
@@ -36,19 +44,28 @@
 				created_at: '',
 				started_at: '',
 				finished_at: '',
-				name: ''
+				name: '',
+				joined:''
 			}
+			
+			var player = {
+				login: '',
+				password: ''
+			}
+			
+			$(document).ready(function() {
+				console.log( "ready!" );
+			});
 
 			
-
+			//Get token from server then authenticate
 			$('#btn-token').on("click", function getToken() {
-				var login = $('#login').val();
-				var password = $('#password').val();
+				player.login = $('#login').val();
+				player.password = $('#password').val();
 				var payload = {
-					"login" : login,
-					"password" : password
+					"login" : player.login,
+					"password" : player.password
 				};
-
 				$.ajax({
 					type: 'POST',
 					dataType: 'json',
@@ -57,11 +74,13 @@
 					success: function(data) {
 						state.token = data.token;
 						console.log("Your token : " + state.token);
+						authentication();
 					},
 				}); 
 			});
 					
-			$('#btn-auth').on("click", function authentication() {
+			//Authentication
+			function authentication() {
 				$.ajax({
 					type: 'POST',
 					dataType: 'json',
@@ -71,15 +90,18 @@
 					},
 					success: function(data) {
 						if(data.authenticated) {
-							console.log("You are authenticated");
+							console.log(player.login + " is authenticated");
 						} else {
 							console.log("Error authentication");
 						}
+						$('#welcome').text("Welcome " + player.login + " !");
 					},
 				}); 
-			});
+			}
 			
+			//List all games
 			$('#btn-list_game').on("click", function getListGames() {
+				$('#dropdown select').empty();
 				$.ajax({
 					type: 'GET',
 					dataType: 'json',
@@ -96,15 +118,19 @@
 								players: data[i].players, 
 								created_at: data[i].created_at, 
 								started_at: data[i].started_at, 
-								finished_at: data[i].finished_at
+								finished_at: data[i].finished_at,
+								joined: data[i].joined
 							});
-							console.log(game[i].id + game[i].players + game[i].created_at + game[i].started_at + game[i].finished_at + game[i].name)
+							$('#dropdown select').append('<option value=' + data[i].id + '>' + data[i].name + '</option>');
+							console.log(game[i].id + game[i].players + game[i].created_at + game[i].started_at + game[i].finished_at + game[i].name + game[i].joined)
 						}
 					},
-				}); 
+				});
 			});
 			
-			//Parameters
+
+			
+			//Show a game by ID
 			$('#btn-show_game').on("click", function showGame() {
 				$.ajax({
 					type: 'GET',
@@ -114,15 +140,12 @@
 						'token': state.token,
 					},
 					success: function(data) {
-						game.id = data.id;
-						game.created_at = data.created_at;
-						game.started_at = data.started_at;
-						game.finished_at = data.finished_at;
-						console.log(game.id + game.created_at + game.started_at + game.finished_at);
+						$('#test').text(data.id);
 					},
 				}); 
 			});
 			
+			//Create a game
 			$('#btn-create_game').on("click", function createGame() {
 				var new_game_name = $('#game_name').val();
 				var number_players = $('#number_players').val();
@@ -140,12 +163,13 @@
 						'token': state.token,
 					},
 					success: function(data) {
-						
-						console.log(game.name);
+						console.log(new_game_name + " game created");
 					},
 				}); 
 			});			
 			
+			
+			/*
 			$('#btn-search_game').on("click", function searchGameByName() {
 				var searched_name = $('#searched_name_game').val();
 				$.ajax({
@@ -168,7 +192,7 @@
 			});			
 			
 			
-			/* $("#butt").onclick function(eu)
+			$("#butt").onclick function(eu)
 					$(window).fire('page_change' $(eu.target).attr[href])
 			*/
 		</script>
