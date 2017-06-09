@@ -1,0 +1,21 @@
+form input {
+	color: black;
+}
+
+body {
+	display: flex;
+	background-color: black;
+	color: white;
+	justify-content: center;
+	width: 50%;
+	flex-direction: column;
+}
+
+h1 {
+	color: #81C0C7;
+}
+
+.centrer {
+	text-align: right;
+	width: 50%
+}

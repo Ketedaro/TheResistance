@@ -1,16 +1,33 @@
 <!DOCTYPE html>
 <html>
 	<head>
+		<LINK rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"></link>
+		<LINK rel="stylesheet" type="text/css" href="stylesheet.css"></link>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" type="text/javascript"></script>
 		<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
 	</head>
 	<body>
+		<header>
+			<img src="logo.png" alt="Logo de The Resistance"/>
+		</header>
+		<h1>Connexion</h1>
+		
+		<div class="centrer">
 		<form name="logForm">
 			Login :<input type="text" name="login" id="login"> <br>
 			Password :<input type="password" name="password" id="password"> <br>
-			<button type="button" id="btn-token"> Token </button>
-			<button type="button" id="btn-auth"> Authenticate </button>
-			<button type="button" id="btn-show_game"> Show </button>
+			<button type="button" id="btn-token" class="btn btn-danger btn-sm"> Token </button>
+			<button type="button" id="btn-auth" class="btn btn-info"> Authenticate </button> <br>
+
+			Create game name :<input type="text" name="game_name" id="game_name"> <br>
+			Number of players :<input type="number" name="number_players" id="number_players" min="5" max="10"> <br>
+			<button type="button" id="btn-create_game" class="btn btn-danger btn-sm"> Create </button> <br>
+			<button type="button" id="btn-list_game" class="btn btn-danger btn-sm"> List </button> <br>
+			<button type="button" id="btn-show_game" class="btn btn-danger btn-sm"> Show </button> <br>
+			Search game by name :<input type="text" name="searched_name_game" id="searched_name_game">
+			<button type="button" id="btn-create_game" class="btn btn-danger btn-sm"> Search  </button>
 		</form>
+		</div>
 		<!-- Documentation github.com/elwinar/the-resistance   -->
 		<script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
 		<script> 
@@ -18,13 +35,19 @@
 			var cfg = {
 				domain: "http://ogg.elwinar.com:56789",
 			};
-
 			var state = {
 				token: '',
 			};
-
-
-
+			
+			var game = {
+				id: '',
+				players: '',
+				created_at: '',
+				started_at: '',
+				finished_at: '',
+				name: ''
+			}
+			
 			$('#btn-token').on("click", function getToken() {
 				var login = $('#login').val();
 				var password = $('#password').val();
@@ -32,7 +55,6 @@
 					"login" : login,
 					"password" : password
 				};
-
 				$.ajax({
 					type: 'POST',
 					dataType: 'json',
@@ -57,30 +79,98 @@
 						if(data.authenticated) {
 							console.log("You are authenticated");
 						} else {
-							console.log("Error authentication")
-						}
-					},
-				}); 
-			});
-
-			$('#btn-show_game').on("click", function showGame() {
-				$.ajax({
-					type: 'POST',
-					dataType: 'json',
-					url: cfg.domain + '/authenticate',
-					headers: {
-						'token': state.token,
-					},
-					success: function(data) {
-						if(data.authenticated) {
-							console.log("You are authenticated");
-						} else {
-							console.log("Error authentication")
+							console.log("Error authentication");
 						}
 					},
 				}); 
 			});
 			
+			$('#btn-list_game').on("click", function getListGames() {
+				$.ajax({
+					type: 'GET',
+					dataType: 'json',
+					url: cfg.domain + '/game',
+					headers: {
+						'token': state.token,
+					},
+					success: function(data) {
+						var game = [];
+						for(var i = 0; i < data.length; i++) {
+							game.push({ 
+								id: data[i].id, 
+								name: data[i].name,
+								players: data[i].players, 
+								created_at: data[i].created_at, 
+								started_at: data[i].started_at, 
+								finished_at: data[i].finished_at
+							});
+							console.log(game[i].id + game[i].players + game[i].created_at + game[i].started_at + game[i].finished_at + game[i].name)
+						}
+					},
+				}); 
+			});
+			
+			//Parameters
+			$('#btn-show_game').on("click", function showGame() {
+				$.ajax({
+					type: 'GET',
+					dataType: 'json',
+					url: cfg.domain + '/game/1',
+					headers: {
+						'token': state.token,
+					},
+					success: function(data) {
+						game.id = data.id;
+						game.created_at = data.created_at;
+						game.started_at = data.started_at;
+						game.finished_at = data.finished_at;
+						console.log(game.id + game.created_at + game.started_at + game.finished_at);
+					},
+				}); 
+			});
+			
+			$('#btn-create_game').on("click", function createGame() {
+				var new_game_name = $('#game_name').val();
+				var number_players = $('#number_players').val();
+				var payload = {
+					"name": new_game_name,
+					"players": parseInt(number_players)
+				};
+				$.ajax({
+					type: 'POST',
+					dataType: 'json',
+					url: cfg.domain + '/game',
+					data: JSON.stringify(payload),
+					headers: {
+						'token': state.token,
+					},
+					success: function(data) {
+						
+						console.log(game.name);
+					},
+				}); 
+			});			
+			
+			$('#btn-search_game').on("click", function searchGameByName() {
+				var searched_name = $('#searched_name_game').val();
+				$.ajax({
+					type: 'POST',
+					dataType: 'json',
+					url: cfg.domain + '/game',
+					headers: {
+						'token': state.token,
+					},
+					success: function(data) {
+						for(var i = 0; i < data.length; i++) {
+							if (data[i].name === searched_name) {
+								console.log("Game " + data[i].name + " found with ID : " + game.id)
+							} else {
+								console.log("No game found")
+							}
+						}
+					},
+				}); 
+			});			
 			
 			
 			/* $("#butt").onclick function(eu)
