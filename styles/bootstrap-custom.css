@@ -8,28 +8,28 @@
   background-color: #e7e7e7;
 }
 
-#games_table {
+#games_table, #mygames_joined {
   margin-top: 20px;
   margin-bottom: 20px;
   overflow: auto;
 }
 
-#games_table table{
+#games_table table, #mygames_joined table{
   width: 80%;
   text-align: center;
 }
 
-#games_table table tr th{
+#games_table table tr th, #mygames_joined table tr th {
   text-align: center;
   color: #ff7700;
   font-size: 22px;
 }
 
-#games_table table td {
+#games_table table td, #mygames_joined table td {
   border-bottom:1pt solid #fff;
 }
 
-#games_table table tr td .btn-show {
+#games_table table tr td .btn-show, #mygames_joined table tr td .btn-show {
   background-color: #008CBA;
   border: none;
   color: white;
@@ -62,7 +62,7 @@
   border-radius: 5px;
 }
 
-#games_table table tr td p {
+#games_table table tr td p, #mygames_joined table tr td p  {
   font-size: 18px;
 }
 
@@ -70,10 +70,22 @@
   margin-bottom: 20px;
 }
 
+#list_players table tr th {
+    padding: 15px;
+}
+
 #low-bloc {
   margin-top: 100px;
 }
 
+#text_show {
+  text-align: center;
+}
+
 #title {
+  color: #ff7700;
+}
+
+#title_show {
   color: #ff7700;
 }
