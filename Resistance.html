@@ -21,59 +21,59 @@
           <div class="container">
               <div class="navbar-header">
                   <button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#navbar-main">
-                      <span class="icon-bar"></span>
-                      <span class="icon-bar"></span>
-                      <span class="icon-bar"></span>
-                  </button>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
                   <a class="navbar-brand" href="#" id="title">The Resistance</a>
               </div>
               <center>
                   <div class="navbar-collapse collapse" id="navbar-main">
-                    <!-- Menu only for user authenticated -->
-                    <div id="option_hidden">
-                      <ul class="nav navbar-nav">
-                        <li><a href="#" id="mygames">Games joined</a></li>
-                      </ul>
-                      <form name="create_game_form" class="navbar-form navbar-left">
-                          <div class="form-group">
-                              <input type="text" class="form-control" name="game_name" placeholder="Name" id="game_name" required>
-                          </div>
-                          <div class="form-group">
-                              <input type="number" class="form-control" name="number_players" placeholder="0" id="number_players" min="5" max="10" required>
-                          </div>
-                          <button type="button" class="btn btn-default" id="btn-create">Create</button>
-                      </form>
-                    </div>
-                    <!-- End -->
-                    <!-- Login Form -->
-                    <div id="login_form">
-                        <form name="login_form" class="navbar-form navbar-right">
-                            <div class="form-group">
-                                <input type="text" class="form-control" name="login" placeholder="Login" id="login" required>
-                            </div>
-                            <div class="form-group">
-                                <input type="password" class="form-control" name="password" placeholder="Password" id="password" required>
-                            </div>
-                            <button type="button" class="btn btn-default" id="btn-login">Log In</button>
-                        </form>
-                    </div>
-                    <!-- End Login Form -->
+                      <!-- Menu only for user authenticated -->
+                      <div id="option_hidden">
+                          <ul class="nav navbar-nav">
+                              <li><a href="#" id="mygames">Games joined</a></li>
+                          </ul>
+                          <form name="create_game_form" class="navbar-form navbar-left">
+                              <div class="form-group">
+                                  <input type="text" class="form-control" name="game_name" placeholder="Name" id="game_name" required>
+                              </div>
+                              <div class="form-group">
+                                  <input type="number" class="form-control" name="number_players" placeholder="0" id="number_players" min="5" max="10" required>
+                              </div>
+                              <button type="button" class="btn btn-default" id="btn-create">Create</button>
+                          </form>
+                      </div>
+                      <!-- End -->
+                      <!-- Login Form -->
+                      <div id="login_form">
+                          <form name="login_form" class="navbar-form navbar-right">
+                              <div class="form-group">
+                                  <input type="text" class="form-control" name="login" placeholder="Login" id="login" required>
+                              </div>
+                              <div class="form-group">
+                                  <input type="password" class="form-control" name="password" placeholder="Password" id="password" required>
+                              </div>
+                              <button type="button" class="btn btn-default" id="btn-login">Log In</button>
+                          </form>
+                      </div>
+                      <!-- End Login Form -->
 
-                    <!-- Welcome user -->
-                    <div class="navbar-right">
-                        <ul class="nav navbar-nav">
-                            <li><a id="welcome"></a></li>
-                            <li>
-                                <!-- Log out button -->
-                                <form name="logout_form" class="navbar-form navbar-right">
-                                    <button type="button" class="btn btn-default" id="btn-logout">Log out</button>
-                                </form>
-                                <!-- End log out button -->
-                            </li>
-                        </ul>
-                    </div>
-                    <!-- End Welcome user -->
-                </div>
+                      <!-- Welcome user -->
+                      <div class="navbar-right">
+                          <ul class="nav navbar-nav">
+                              <li><a id="welcome"></a></li>
+                              <li>
+                                  <!-- Log out button -->
+                                  <form name="logout_form" class="navbar-form navbar-right">
+                                      <button type="button" class="btn btn-default" id="btn-logout">Log out</button>
+                                  </form>
+                                  <!-- End log out button -->
+                              </li>
+                          </ul>
+                      </div>
+                      <!-- End Welcome user -->
+                  </div>
               </center>
           </div>
       </div>
@@ -128,7 +128,9 @@
           <h4 class="text-primary">You are the player {{player}}</h4>
           <h4 class="text-danger">Get Ready !</h4>
           <h3 class="text-primary"><u>List of players</u></h3>
-          <div id="list_players"><!-- filled with script --></div>
+          <div id="list_players">
+              <!-- filled with script -->
+          </div>
           <button type="button" class="btn btn-primary btn-lg" id="btn-back"><span class="glyphicon glyphicon-chevron-left"></span> Back</button>
           <p> </p>
       </script>
@@ -136,78 +138,110 @@
 
       <!-- Template n°3 : list of players in a game -->
       <script id="template_3" type="text/template">
-        <table>
-          <tr>
-            <th id="title_show">User ID</th>
-            <th id="title_show">Joined at</th>
-          </tr>
-          {{ #players }}
-            <tr>
-              <td><p id="text_show" class="text-primary">{{ user_id }}</p></td>
-              <td><p id="text_show" class="text-primary">{{ joined_at }}</p></td>
-            </tr>
-          {{ /players }}
-        </table>
+          <table>
+              <tr>
+                  <th id="title_show">User ID</th>
+                  <th id="title_show">Joined at</th>
+              </tr>
+              {{ #players }}
+              <tr>
+                  <td>
+                      <p id="text_show" class="text-primary">{{ user_id }}</p>
+                  </td>
+                  <td>
+                      <p id="text_show" class="text-primary">{{ joined_at }}</p>
+                  </td>
+              </tr>
+              {{ /players }}
+          </table>
       </script>
       <!-- End template n°3 -->
 
       <!-- Template n°4 : list all games -->
       <script id="template_4" type="text/template">
-        <table>
-          <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Players</th>
-            <th>Date</th>
-            <th>Hour</th>
-            <th>Started at</th>
-            <th>Finished at</th>
-            <th>Show</th>
-            <th>Join</th>
-          </tr>
-          {{ #games }}
-            <tr>
-              <td><p>{{ id }}</p></td>
-              <td><p>{{ name }}</p></td>
-              <td><p>{{ joined }}/{{ players }}</p></td>
-              <td><p>{{ created_at }}</p></td>
-              <td><p>{{ created_hour }}</p></td>
-              <td><p>{{ started_at }}</p></td>
-              <td><p>{{ finished_at }}</p></td>
-              <td><button type='button' class='btn-show' id='{{ id }}'>Show</button></td>
-              <td><button type='button' class='btn-join' id='{{ id }}' name='{{ name }}'>Join</button></td>
-            </tr>
-          {{ /games }}
-        </table>
+          <table>
+              <tr>
+                  <th>ID</th>
+                  <th>Name</th>
+                  <th>Players</th>
+                  <th>Date</th>
+                  <th>Hour</th>
+                  <th>Started at</th>
+                  <th>Finished at</th>
+                  <th>Show</th>
+                  <th>Join</th>
+              </tr>
+              {{ #games }}
+              <tr>
+                  <td>
+                      <p>{{ id }}</p>
+                  </td>
+                  <td>
+                      <p>{{ name }}</p>
+                  </td>
+                  <td>
+                      <p>{{ joined }}/{{ players }}</p>
+                  </td>
+                  <td>
+                      <p>{{ created_at }}</p>
+                  </td>
+                  <td>
+                      <p>{{ created_hour }}</p>
+                  </td>
+                  <td>
+                      <p>{{ started_at }}</p>
+                  </td>
+                  <td>
+                      <p>{{ finished_at }}</p>
+                  </td>
+                  <td><button type='button' class='btn-show' id='{{ id }}'>Show</button></td>
+                  <td><button type='button' class='btn-join' id='{{ id }}' name='{{ name }}'>Join</button></td>
+              </tr>
+              {{ /games }}
+          </table>
       </script>
       <!-- End template n°4 -->
 
       <!-- Template n°5 : list all games joined by the current user -->
       <script id="template_5" type="text/template">
-        <table>
-          <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Players</th>
-            <th>Date</th>
-            <th>Hour</th>
-            <th>Started at</th>
-            <th>Finished at</th>
-            <th>Show</th>
-          </tr>
-          {{ #mygames }}
-            <tr>
-              <td><p>{{ id }}</p></td>
-              <td><p>{{ name }}</p></td>
-              <td><p>{{ joined }}/{{ players }}</p></td>
-              <td><p>{{ created_at }}</p></td>
-              <td><p>{{ created_hour }}</p></td>
-              <td><p>{{ started_at }}</p></td>
-              <td><p>{{ finished_at }}</p></td>
-              <td><button type='button' class='btn-show' id='{{ id }}'>Show</button></td>
-            </tr>
-          {{ /mygames }}
-        </table>
+          <table>
+              <tr>
+                  <th>ID</th>
+                  <th>Name</th>
+                  <th>Players</th>
+                  <th>Date</th>
+                  <th>Hour</th>
+                  <th>Started at</th>
+                  <th>Finished at</th>
+                  <th>Show</th>
+              </tr>
+              {{ #mygames }}
+              <tr>
+                  <td>
+                      <p>{{ id }}</p>
+                  </td>
+                  <td>
+                      <p>{{ name }}</p>
+                  </td>
+                  <td>
+                      <p>{{ joined }}/{{ players }}</p>
+                  </td>
+                  <td>
+                      <p>{{ created_at }}</p>
+                  </td>
+                  <td>
+                      <p>{{ created_hour }}</p>
+                  </td>
+                  <td>
+                      <p>{{ started_at }}</p>
+                  </td>
+                  <td>
+                      <p>{{ finished_at }}</p>
+                  </td>
+                  <td><button type='button' class='btn-show' id='{{ id }}'>Show</button></td>
+              </tr>
+              {{ /mygames }}
+          </table>
       </script>
       <!-- End template n°5 -->
 
@@ -258,21 +292,21 @@
 
           //Create a game
           $('#btn-create').on("click", function() {
-            game_name = $('#game_name').val();
-            number_players = $('#number_players').val();
-            createGame(game_name, number_players);
-            getListGames();
-            $('#mygames_joined').hide();
-            $('#game_joined').hide();
-            $('#game_to_show').hide();
+              game_name = $('#game_name').val();
+              number_players = $('#number_players').val();
+              createGame(game_name, number_players);
+              getListGames();
+              $('#mygames_joined').hide();
+              $('#game_joined').hide();
+              $('#game_to_show').hide();
           });
 
           //Come back to the menu
           $('#title').on("click", function() {
-            $('#mygames_joined').hide();
-            $('#game_joined').hide();
-            $('#game_to_show').hide();
-            $('#games_table').show();
+              $('#mygames_joined').hide();
+              $('#game_joined').hide();
+              $('#game_to_show').hide();
+              $('#games_table').show();
           });
 
           //Get a token from the server and create a cookie with it
@@ -429,132 +463,131 @@
           });
 
           //Join a game
-    			$('body').on("click", ".btn-join", function joinGame() {
-    				var name = $(this).attr('name');
-    				var id = $(this).attr('id');
-    				var payload = {
-    						"name": name
-    				};
-    				$.ajax({
-    					type: 'POST',
-    					dataType: 'json',
-    					url: cfg.domain + '/game/' + id + '/join',
-    					data: JSON.stringify(payload),
-    					headers: {
-    						'token': state.token,
-    					},
-    					success: function(data) {
-                var game_joined = {
-                  id: id,
-                  name: name,
-                  player: data.player
-                };
-                $('#games_table').hide();
-                var template = $('#template_2').html();
-                var html = Mustache.to_html(template, game_joined);
-                $('#game_joined').html(html).show();
-                getListOfPlayersInAGame(id);
-    					},
-    				});
-    			});
+          $('body').on("click", ".btn-join", function joinGame() {
+              var name = $(this).attr('name');
+              var id = $(this).attr('id');
+              var payload = {
+                  "name": name
+              };
+              $.ajax({
+                  type: 'POST',
+                  dataType: 'json',
+                  url: cfg.domain + '/game/' + id + '/join',
+                  data: JSON.stringify(payload),
+                  headers: {
+                      'token': state.token,
+                  },
+                  success: function(data) {
+                      var game_joined = {
+                          id: id,
+                          name: name,
+                          player: data.player
+                      };
+                      $('#games_table').hide();
+                      var template = $('#template_2').html();
+                      var html = Mustache.to_html(template, game_joined);
+                      $('#game_joined').html(html).show();
+                      getListOfPlayersInAGame(id);
+                  },
+              });
+          });
 
           //List all players in a game
           function getListOfPlayersInAGame(id) {
-            $.ajax({
-              type: 'GET',
-              dataType: 'json',
-              url: cfg.domain + '/game/' + id + '/players',
-              headers: {
-                'token': state.token,
-              },
-              success: function(data) {
-                var players = [];
-                if (data.length != null) {
-                  for(var i = 0; i < data.length; i++) {
-                    var hour_joined = jQuery.trim(data.joined_at).substring(11, 19);
-                    players.push({
-                      id: data[i].id,
-                      user_id: data[i].user_id,
-                      name: data[i].name,
-                      joined_at: hour_joined
-                    });
-                  }
-                  var template = $('#template_3').html();
-                  var html = Mustache.to_html(template, {
-                      players: players,
-                  });
-                  $('#list_players').html(html).show();
-                } else {
-                  console.log("No players in this game");
-                }
-              },
-            });
+              $.ajax({
+                  type: 'GET',
+                  dataType: 'json',
+                  url: cfg.domain + '/game/' + id + '/players',
+                  headers: {
+                      'token': state.token,
+                  },
+                  success: function(data) {
+                      var players = [];
+                      if (data.length != null) {
+                          for (var i = 0; i < data.length; i++) {
+                              var hour_joined = jQuery.trim(data.joined_at).substring(11, 19);
+                              players.push({
+                                  id: data[i].id,
+                                  user_id: data[i].user_id,
+                                  name: data[i].name,
+                                  joined_at: hour_joined
+                              });
+                          }
+                          var template = $('#template_3').html();
+                          var html = Mustache.to_html(template, {
+                              players: players,
+                          });
+                          $('#list_players').html(html).show();
+                      } else {
+                          console.log("No players in this game");
+                      }
+                  },
+              });
           }
 
           //List all games joined by the current user
-          $('#mygames').on("click",function getGamesJoinedByCurUser() {
-            $.ajax({
-              type: 'GET',
-              dataType: 'json',
-              url: cfg.domain + '/joined',
-              headers: {
-                'token': state.token,
-              },
-              success: function(data) {
-                var mygames = [];
-                if (data.length != null) {
-                  for(var i = 0; i < data.length; i++) {
-                    var date_creation = jQuery.trim(data[i].created_at).substring(0, 10);
-                    var hour_creation = jQuery.trim(data[i].created_at).substring(11, 19);
-                    var hour_start = jQuery.trim(data[i].started_at).substring(11, 19);
-                    var hour_finish = jQuery.trim(data[i].finished_at).substring(11, 19);
-                    mygames.push({
-                      id: data[i].id,
-                      name: data[i].name,
-                      players: data[i].players,
-                      joined: data[i].joined,
-                      created_at: date_creation,
-                      created_hour: hour_creation,
-                      started_at: hour_start,
-                      finished_at: hour_finish
-                    });
-                  }
-                  var template = $('#template_5').html();
-                  var html = Mustache.to_html(template, {
-                      mygames: mygames,
-                  });
-                  $('#games_table').hide();
-                  $('#game_to_show').hide();
-                  $('#game_joined').hide();
-                  $('#mygames_joined').html(html).show();
-                } else {
-                  console.log("No game(s) joined...")
-                }
-              },
-            });
+          $('#mygames').on("click", function getGamesJoinedByCurUser() {
+              $.ajax({
+                  type: 'GET',
+                  dataType: 'json',
+                  url: cfg.domain + '/joined',
+                  headers: {
+                      'token': state.token,
+                  },
+                  success: function(data) {
+                      var mygames = [];
+                      if (data.length != null) {
+                          for (var i = 0; i < data.length; i++) {
+                              var date_creation = jQuery.trim(data[i].created_at).substring(0, 10);
+                              var hour_creation = jQuery.trim(data[i].created_at).substring(11, 19);
+                              var hour_start = jQuery.trim(data[i].started_at).substring(11, 19);
+                              var hour_finish = jQuery.trim(data[i].finished_at).substring(11, 19);
+                              mygames.push({
+                                  id: data[i].id,
+                                  name: data[i].name,
+                                  players: data[i].players,
+                                  joined: data[i].joined,
+                                  created_at: date_creation,
+                                  created_hour: hour_creation,
+                                  started_at: hour_start,
+                                  finished_at: hour_finish
+                              });
+                          }
+                          var template = $('#template_5').html();
+                          var html = Mustache.to_html(template, {
+                              mygames: mygames,
+                          });
+                          $('#games_table').hide();
+                          $('#game_to_show').hide();
+                          $('#game_joined').hide();
+                          $('#mygames_joined').html(html).show();
+                      } else {
+                          console.log("No game(s) joined...")
+                      }
+                  },
+              });
           });
 
           //Create a game
           function createGame(name, players) {
-    				var payload = {
-    					"name": name,
-    					"players": parseInt(players)
-    				};
-    				$.ajax({
-    					type: 'POST',
-    					dataType: 'json',
-    					url: cfg.domain + '/game',
-    					data: JSON.stringify(payload),
-    					headers: {
-    						'token': state.token,
-    					},
-    					success: function(data) {
-                $('#welcome').text(name + " game created ! ");
-    						console.log(name + " game created");
-    					},
-    				});
-    			}
-
+              var payload = {
+                  "name": name,
+                  "players": parseInt(players)
+              };
+              $.ajax({
+                  type: 'POST',
+                  dataType: 'json',
+                  url: cfg.domain + '/game',
+                  data: JSON.stringify(payload),
+                  headers: {
+                      'token': state.token,
+                  },
+                  success: function(data) {
+                      $('#welcome').text(name + " game created ! ");
+                      console.log(name + " game created");
+                  },
+              });
+          }
       </script>
   </body>
 
