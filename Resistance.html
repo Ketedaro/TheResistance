@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>The Resistance</title>
+
+    <link href="styles/bootstrap-custom.css" rel="stylesheet">
+    <link href="http://netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css" rel="stylesheet">
+    <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+    <script type="text/javascript" src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+    <script src="http://netdna.bootstrapcdn.com/bootstrap/3.1.0/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/js-cookie/2.1.4/js.cookie.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/2.3.0/mustache.js"></script>
+</head>
+
+<body>
+    <div class="navbar navbar-default navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#navbar-main">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#" id="title">The Resistance</a>
+            </div>
+            <center>
+                <div class="navbar-collapse collapse" id="navbar-main">
+                    <ul class="nav navbar-nav">
+                        <li><a href="#">Create game</a>
+                        </li>
+                        <li><a href="#">Games joined</a>
+                        </li>
+                    </ul>
+
+                    <!-- Login Form -->
+                    <div id="login_form">
+                        <form name="login_form" class="navbar-form navbar-right">
+                            <div class="form-group">
+                                <input type="text" class="form-control" name="login" placeholder="Login" id="login" required>
+                            </div>
+                            <div class="form-group">
+                                <input type="password" class="form-control" name="password" placeholder="Password" id="password" required>
+                            </div>
+                            <button type="button" class="btn btn-default" id="btn-login">Log In</button>
+                        </form>
+                    </div>
+                    <!-- End Login Form -->
+
+                    <!-- Welcome user -->
+                    <div class="navbar-right">
+                        <ul class="nav navbar-nav">
+                            <li><a id="welcome"></a></li>
+                                <li>
+                                    <!-- Log out button -->
+                                    <form name="logout_form" class="navbar-form navbar-right">
+                                        <button type="button" class="btn btn-default" id="btn-logout">Log out</button>
+                                    </form>
+                                    <!-- End log out button -->
+                                </li>
+                        </ul>
+                    </div>
+                    <!-- End Welcome user -->
+                </div>
+            </center>
+        </div>
+    </div>
+    <!-- End navbar -->
+
+    <center>
+
+        <div id="low-bloc">
+            <div class="container-custom">
+
+
+                <!-- List of games -->
+                <div id="games_table">
+                    <!-- script filled it -->
+                </div>
+                <!-- End list of games -->
+
+                <!-- Game to show -->
+                <div id="game_to_show">
+                    <!-- Filled with script -->
+                </div>
+                <!-- End game to show -->
+
+            </div>
+        </div>
+    </center>
+
+    <!-- Template n°1 : show a game -->
+    <script id="template_1" type="text/template">
+        <h2 class="text-primary">Game n°{{id}}</h2>
+        <h2 class="text-primary">Name : {{name}}</h2>
+        <button type="button" class="btn btn-primary btn-lg" id="btn-back"><span class="glyphicon glyphicon-chevron-left"></span> Back</button>
+    </script>
+    <!-- End template n°1 -->
+
+    <script>
+        var cfg = {
+            domain: "http://ogg.elwinar.com:56789"
+        };
+
+        var state = {
+            token: ''
+        };
+
+        var game = {
+            id: '',
+            players: '',
+            created_at: '',
+            started_at: '',
+            finished_at: '',
+            name: '',
+            joined: ''
+        };
+
+        //Document ready
+        $(document).ready(function() {
+            console.log("Ready !");
+            $('.container-custom').hide();
+            //Case when user refreshes the page
+            if (Cookies.get('token_andy') == undefined) {
+                console.log("Cookie undefined, it's normal");
+            } else {
+                //Get object from my cookie
+                var temp_cookie = JSON.parse(Cookies.get('token_andy'));
+                state.token = temp_cookie.token;
+                var login_cookie = temp_cookie.login;
+                authentication(login_cookie);
+            }
+        });
+
+        //Get token on click
+        $('#btn-login').on("click", function() {
+            var login = $('#login').val();
+            var password = $('#password').val();
+            getToken(login, password);
+
+        });
+
+        //Get a token from the server and create a cookie with it
+        function getToken(login, password) {
+            var payload = {
+                "login": login,
+                "password": password
+            };
+            $.ajax({
+                type: 'POST',
+                dataType: 'json',
+                url: cfg.domain + '/login',
+                data: JSON.stringify(payload),
+                success: function(data) {
+                    state.token = data.token;
+                    console.log("Your received a token : " + jQuery.trim(state.token).substring(0, 5) + "...");
+                    var cookie_token = {
+                        "login": login,
+                        "token": state.token
+                    }
+                    authentication(login);
+                    //Create a cookie which contains login and token
+                    Cookies.set('token_andy', JSON.stringify(cookie_token));
+                },
+            });
+        }
+
+        //Authentication
+        function authentication(login) {
+            $.ajax({
+                type: 'POST',
+                dataType: 'json',
+                url: cfg.domain + '/authenticate',
+                headers: {
+                    'token': state.token,
+                },
+                success: function(data) {
+                    if (data.authenticated) {
+                        console.log(login + " is authenticated");
+                        $('#login_form').hide();
+                        $('#welcome').text("Welcome " + login + " !");
+                        //Refresh token every 4 minutes
+                        var refresh = setInterval(function() {
+                            refreshAuthentication(login);
+                        }, 240000);
+                        getListGames();
+                    } else {
+                        console.log("Error authentication");
+                    }
+                },
+            });
+        }
+
+        //Refresh token
+        function refreshAuthentication(login) {
+            $.ajax({
+                type: 'POST',
+                dataType: 'json',
+                url: cfg.domain + '/authenticate',
+                headers: {
+                    'token': state.token,
+                },
+                success: function(data) {
+                    if (data.authenticated) {
+                        console.log("Authentication refreshed (" + login + ")");
+                    } else {
+                        console.log("Error refreshing authentication");
+                    }
+                },
+            });
+        }
+
+        //List all games
+        function getListGames() {
+            $('#dropdown').empty(); //clear drop-down list
+            $('#games_table tr').remove(); //clear table
+            $.ajax({
+                type: 'GET',
+                dataType: 'json',
+                url: cfg.domain + '/game',
+                headers: {
+                    'token': state.token,
+                },
+                success: function(data) {
+                    var games = [];
+                    for (var i = 0; i < data.length; i++) {
+                        var date_creation = jQuery.trim(data[i].created_at).substring(0, 10);
+                        var hour_creation = jQuery.trim(data[i].created_at).substring(11, 19);
+                        games.push({
+                            id: data[i].id,
+                            name: data[i].name,
+                            players: data[i].players,
+                            created_at: date_creation,
+                            created_hour: hour_creation,
+                            started_at: data[i].started_at,
+                            finished_at: data[i].finished_at,
+                            joined: data[i].joined
+                        });
+                    }
+                    var template =
+                        "<table>" +
+                        "<tr>" +
+                        "<th>ID</th>" +
+                        "<th>Name</th>" +
+                        "<th>Players</th>" +
+                        "<th>Date</th>" +
+                        "<th>Hour</th>" +
+                        "<th>Started at</th>" +
+                        "<th>Joined</th>" +
+                        "<th>Finished at</th>" +
+                        "<th>Show</th>" +
+                        "<th>Join</th>" +
+                        "</tr>" +
+                        "{{ #games }}" +
+                        "<tr>" +
+                        "<td><p>{{ id }}</p></td>" +
+                        "<td><p>{{ name }}</p></td>" +
+                        "<td><p>{{ players }}</p></td>" +
+                        "<td><p>{{ created_at }}</p></td>" +
+                        "<td><p>{{ created_hour }}</p></td>" +
+                        "<td><p>{{ started_at }}</p></td>" +
+                        "<td><p>{{ joined }}</p></td>" +
+                        "<td><p>{{ finished_at }}</p></td>" +
+                        "<td><button type='button' class='btn-show' id='{{ id }}'>Show</button>" +
+                        "<td><button type='button' class='btn-join' id='{{ id }}' name='{{ name }}'>Join</button>" +
+                        "</tr>" +
+                        "{{ /games }}" +
+                        "</table>";
+                    $('#games_table').append(Mustache.render(template, {
+                        games: games,
+                    }));
+                    $('.container-custom').show();
+                },
+            });
+        }
+
+        //Show a game
+        $('body').on("click", ".btn-show", function showGameInput() {
+            var id = $(this).attr('id');
+            $.ajax({
+                type: 'GET',
+                dataType: 'json',
+                url: cfg.domain + '/game/' + id,
+                headers: {
+                    'token': state.token,
+                },
+                success: function(data) {
+                    var game = {
+                        id: data.id,
+                        name: data.name
+                    };
+                    $('#games_table').hide();
+                    var template = $('#template_1').html();
+                    var html = Mustache.to_html(template, game);
+                    $('#game_to_show').html(html).show();
+                },
+            });
+        });
+
+        $('body').on("click", "#btn-back", function back() {
+            $('#game_to_show').hide();
+            $('#games_table').show();
+            getListGames();
+        });
+    </script>
+</body>
+
+</html>

@@ -116,19 +116,19 @@
 
       //Document ready
       $(document).ready(function() {
-				console.log( "Ready !" );
+		console.log( "Ready !" );
         $('.container-custom').hide();
         //Case when user refreshes the page
-				if (Cookies.get('token_andy') == undefined) {
-					console.log("Cookie undefined, it's normal");
-				} else {
+		if (Cookies.get('token_andy') == undefined) {
+			console.log("Cookie undefined, it's normal");
+		} else {
           //Get object from my cookie
-					var temp_cookie = JSON.parse(Cookies.get('token_andy'));
-					state.token = temp_cookie.token;
-					var login_cookie = temp_cookie.login;
-					authentication(login_cookie);
-				}
-			});
+			var temp_cookie = JSON.parse(Cookies.get('token_andy'));
+			state.token = temp_cookie.token;
+			var login_cookie = temp_cookie.login;
+			authentication(login_cookie);
+			}
+		});
 
 			//Get token on click
       $('#btn-login').on("click", function() {
@@ -252,9 +252,7 @@
 													"<td><p>{{ id }}</p></td>" +
 													"<td><p>{{ name }}</p></td>" +
 													"<td><p>{{ players }}</p></td>" +
-                          "<div id='test'>"+
 													"<td><p>{{ created_at }}</p></td>" +
-                          "</div>" +
                           "<td><p>{{ created_hour }}</p></td>" +
 													"<td><p>{{ started_at }}</p></td>" +
 													"<td><p>{{ joined }}</p></td>" +
