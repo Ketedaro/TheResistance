@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+	</head>
+	<body>
+		<form name="logForm">
+			Login :<input type="text" name="login" id="login"> <br>
+			Password :<input type="password" name="password" id="password"> <br>
+			<button type="button" id="btn-token"> Authenticate </button>
+			<!-- Welcome + Login -->
+			<div id="welcome"><p>Welcome !</p></div> <br>
+		</form>
+		<form name="gameOptionForm">
+			Create game name :<input type="text" name="game_name" id="game_name"> <br>
+			Number of players :<input type="number" name="number_players" id="number_players" min="5" max="10"> <br>
+			<button type="button" id="btn-create_game"> Create </button>
+			<!-- <button type="button" id="btn-show_game"> Show </button> <br> -->
+
+			<button type="button" id="btn-games_cur_user"> Game(s) joined </button> <br>
+
+
+			<!-- <select name="drop-down-list" id="dropdown"> Js populating options </select> <br> -->
+
+			<!-- Game ID to show -->
+			<div id="game_to_show"><p>No game to show</p></div>
+
+			<!-- Game joined -->
+			<div id="game_joined"><p>No game joined</p></div>
+		</form>
+
+		<!-- List of games -->
+		<div id="games_table"></div>
+
+
+
+		<!-- http://handlebarsjs.com/  -->
+		<!-- https://github.com/janl/mustache.js -->
+		<!-- Documentation github.com/elwinar/the-resistance   -->
+
+
+		<script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/js-cookie/2.1.4/js.cookie.js"></script>
+		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/2.3.0/mustache.js"></script>
+		<script>
+
+			//Refresh token every 4 minutes
+
+			var cfg = {
+				domain: "http://ogg.elwinar.com:56789"
+			};
+
+			var state = {
+				token: ''
+			};
+
+			var game = {
+				id: '',
+				players: '',
+				created_at: '',
+				started_at: '',
+				finished_at: '',
+				name: '',
+				joined:''
+			};
+
+			$(document).ready(function() {
+				console.log( "Ready !" );
+				if (Cookies.get('test') == undefined) {
+					console.log("Cookie undefined, it's normal");
+				} else {
+					var temp_cookie = JSON.parse(Cookies.get('test'));
+					state.token = temp_cookie.token;
+					var login_cookie = temp_cookie.login;
+					authentication(login_cookie);
+				}
+
+			});
+
+			//Get token from server then authenticate
+      $('#btn-token').on("click", function() {
+        var login = $('#login').val();
+        var password = $('#password').val();
+				getToken(login,password);
+
+      });
+
+      function getToken(login, password) {
+        var payload = {
+          "login" : login,
+          "password" : password
+        };
+        $.ajax({
+          type: 'POST',
+          dataType: 'json',
+          url: cfg.domain + '/login',
+          data: JSON.stringify(payload),
+          success: function(data) {
+            state.token = data.token;
+            console.log("Your received a token : " + jQuery.trim(state.token).substring(0, 10) + "...");
+						var cookie_token = {
+							"login": login,
+							"token": state.token
+						}
+            authentication(login);
+            getListGames();
+						Cookies.set('test', JSON.stringify(cookie_token));
+						console.log("Cookie" + Cookies.get('test'));
+          },
+        });
+      }
+
+			//Authentication
+			function authentication(login) {
+				$.ajax({
+					type: 'POST',
+					dataType: 'json',
+					url: cfg.domain + '/authenticate',
+					headers: {
+						'token': state.token,
+					},
+					success: function(data) {
+						if(data.authenticated) {
+							console.log(login + " is authenticated");
+							$('#welcome p').text("Welcome " + login + " !");
+							var refresh = setInterval(function() { refreshAuthentication(login); }, 5000);
+						} else {
+							console.log("Error authentication");
+						}
+
+					},
+				});
+			}
+
+			function refreshAuthentication(login) {
+				$.ajax({
+					type: 'POST',
+					dataType: 'json',
+					url: cfg.domain + '/authenticate',
+					headers: {
+						'token': state.token,
+					},
+					success: function(data) {
+						if(data.authenticated) {
+							console.log("Authentication refreshed (" + login + ")");
+						} else {
+							console.log("Error refreshing authentication");
+						}
+					},
+				});
+			}
+
+			//List all games
+			function getListGames() {
+				$('#dropdown').empty(); //clear drop-down list
+				$('#games_table tr').remove(); //clear table
+				$.ajax({
+					type: 'GET',
+					dataType: 'json',
+					url: cfg.domain + '/game',
+					headers: {
+						'token': state.token,
+					},
+					success: function(data) {
+						var games = [];
+						for(var i = 0; i < data.length; i++) {
+							games.push({
+								id: data[i].id,
+								name: data[i].name,
+								players: data[i].players,
+								created_at: data[i].created_at,
+								started_at: data[i].started_at,
+								finished_at: data[i].finished_at,
+								joined: data[i].joined
+							});
+							//$('#dropdown').append('<option value=' + data[i].id + '>' + data[i].name + '</option>');
+							//$('#games_table').append('<tr><td>' + data[i].id + '</td><td>' + data[i].name + '</td><td>' + data[i].players + '</td><td>' + data[i].created_at + '</td><td>' + data[i].started_at + '</td><td>' + data[i].finished_at + '</td><td>' + data[i].joined + '</td><td><button type="button" class="btn-show" id="'+(i+1)+'">Show</button>' + '</td><td><button type="button" class="btn-join" name="'+data[i].name+'" id="'+(i+1)+'">Join</button></td></tr>');
+							//console.log(games[i].id + " " + games[i].players + " " + games[i].created_at + " " + games[i].started_at + " " + games[i].finished_at + " " + games[i].name + " " + games[i].joined);
+
+						}
+						var template = "<table>" +
+											"{{ #games }}" +
+												"<tr>" +
+													"<td>{{ id }}</td>" +
+													"<td>{{ name }}</td>" +
+													"<td>{{ players }}</td>" +
+													"<td>{{ created_at }}</td>" +
+													"<td>{{ started_at }}</td>" +
+													"<td>{{ joined }}</td>" +
+													"<td>{{ finished_at }}</td>" +
+													"<td><button type='button' class='btn-show' id='{{ id }}'>Show</button>" +
+													"<td><button type='button' class='btn-join' id='{{ id }}' name='{{ name }}'>Join</button>" +
+												"</tr>" +
+											"{{ /games }}" +
+										"</table>";
+						$('#games_table').append(Mustache.render(template, {
+							games: games,
+						}));
+					},
+				});
+			}
+
+
+			//Show a game
+			$('.btn-show').live("click", function showGameInput() {
+				var id = $(this).attr('id');
+				$.ajax({
+					type: 'GET',
+					dataType: 'json',
+					url: cfg.domain + '/game/' + id,
+					headers: {
+						'token': state.token,
+					},
+					success: function(data) {
+						$('#game_to_show p').text("Game ID : " + data.id + " Name : " + data.name);
+					},
+				});
+
+			});
+
+			//Show a game by ID - NOT USED
+			$('#btn-show_game').on("click", function showGame() {
+				var game_id_dropdown = $('#dropdown :selected').val();
+				$.ajax({
+					type: 'GET',
+					dataType: 'json',
+					url: cfg.domain + '/game/' + game_id_dropdown,
+					headers: {
+						'token': state.token,
+					},
+					success: function(data) {
+						$('#game_to_show p').text("Game ID : " + data.id + " Name : " + data.name);
+					},
+				});
+			});
+
+			//Create a game
+			$('#btn-create_game').on("click", function createGame() {
+				var new_game_name = $('#game_name').val();
+				var number_players = $('#number_players').val();
+				var payload = {
+					"name": new_game_name,
+					"players": parseInt(number_players)
+				};
+
+				$.ajax({
+					type: 'POST',
+					dataType: 'json',
+					url: cfg.domain + '/game',
+					data: JSON.stringify(payload),
+					headers: {
+						'token': state.token,
+					},
+					success: function(data) {
+						getListGames();
+						console.log(new_game_name + " game created");
+					},
+				});
+			});
+
+
+			//Join a game
+			$('.btn-join').live("click", function joinGame() {
+				var name = $(this).attr('name');
+				var id = $(this).attr('id');
+				var payload = {
+						"name": name
+				};
+				$.ajax({
+					type: 'POST',
+					dataType: 'json',
+					url: cfg.domain + '/game/' + id + '/join',
+					data: JSON.stringify(payload),
+					headers: {
+						'token': state.token,
+					},
+					success: function(data) {
+						var number_players = getListPlayersInGame(id);
+						$('#game_joined p').text("Game : " + name + " joined ! Player(s) in the room : " + number_players);
+						getListGames();
+					},
+				});
+			});
+
+			//List all players in a game
+			function getListPlayersInGame(id) {
+				$.ajax({
+					type: 'GET',
+					dataType: 'json',
+					url: cfg.domain + '/game/' + id + '/players',
+					headers: {
+						'token': state.token,
+					},
+					success: function(data) {
+						var players = [];
+						if (data.length != null) {
+							for(var i = 0; i < data.length; i++) {
+								players.push({
+									id: data[i].id,
+									user_id: data[i].user_id,
+									name: data[i].name,
+									joined_at: data[i].joined_at,
+								});
+								console.log(players[i].id + " " + players[i].user_id + " " + players[i].name + " " + players[i].joined_at);
+							}
+						} else {
+							console.log("No players in this game");
+						}
+						console.log("Number of player(s) : " + data.length);
+						return data.length;
+					},
+				});
+			}
+
+			//List all games joined by the current user
+			$('#btn-games_cur_user').on("click",function getGamesJoinedByCurUser() {
+				$.ajax({
+					type: 'GET',
+					dataType: 'json',
+					url: cfg.domain + '/joined',
+					headers: {
+						'token': state.token,
+					},
+					success: function(data) {
+						var mygames = [];
+						if (data.length != null) {
+							for(var i = 0; i < data.length; i++) {
+								mygames.push({
+									id: data[i].id,
+									name: data[i].name,
+									players: data[i].players,
+									joined: data[i].joined,
+									created_at: data[i].created_at,
+									started_at: data[i].started_at,
+									finished_at: data[i].finished_at
+								});
+								console.log(mygames[i].id + " " + mygames[i].name + " " + mygames[i].created_at + " " + mygames[i].joined);
+							}
+						} else {
+							console.log("No game(s) joined...")
+						}
+					},
+				});
+			});
+
+			/*var template =
+					"<table>" +
+					"<tr>" +
+					"<th>ID</th>" +
+					"<th>Name</th>" +
+					"<th>Players</th>" +
+					"<th>Date</th>" +
+					"<th>Hour</th>" +
+					"<th>Started at</th>" +
+					"<th>Finished at</th>" +
+					"<th>Show</th>" +
+					"<th>Join</th>" +
+					"</tr>" +
+					"{{ #games }}" +
+					"<tr>" +
+					"<td><p>{{ id }}</p></td>" +
+					"<td><p>{{ name }}</p></td>" +
+					"<td><p>{{ joined }}/{{ players }}</p></td>" +
+					"<td><p>{{ created_at }}</p></td>" +
+					"<td><p>{{ created_hour }}</p></td>" +
+					"<td><p>{{ started_at }}</p></td>" +
+					"<td><p>{{ finished_at }}</p></td>" +
+					"<td><button type='button' class='btn-show' id='{{ id }}'>Show</button>" +
+					"<td><button type='button' class='btn-join' id='{{ id }}' name='{{ name }}'>Join</button>" +
+					"</tr>" +
+					"{{ /games }}" +
+					"</table>";
+			$('#games_table').append(Mustache.render(template, {
+					games: games,
+			}));
+			$('.container-custom').show();*/
+
+
+
+			/*$("#butt").onclick function(eu)
+					$(window).fire('page_change' $(eu.target).attr[href])
+			*/
+		</script>
+	</body>
+</html>
