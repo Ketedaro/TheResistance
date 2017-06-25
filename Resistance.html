@@ -80,6 +80,10 @@
       <!-- End navbar -->
 
       <center>
+		  <div id="image">
+			</br></br></br></br></br>
+			<img src="image/resistance.png" alt="Picture of a fist"/>
+		  </div>
           <div id="low-bloc">
               <div class="container-custom">
 
@@ -267,6 +271,7 @@
           //Document ready
           $(document).ready(function() {
               console.log("Ready !");
+			  $('#image').show();
               $('#btn-logout').hide();
               $('#option_hidden').hide();
               $('.container-custom').hide();
@@ -346,6 +351,7 @@
                   success: function(data) {
                       if (data.authenticated) {
                           console.log(login + " is authenticated");
+						  $('#image').hide();
                           $('#login_form').hide();
                           $('#option_hidden').show();
                           $('#btn-logout').show();
